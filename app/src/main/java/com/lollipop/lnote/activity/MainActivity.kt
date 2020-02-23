@@ -1,7 +1,8 @@
-package com.lollipop.lnote
+package com.lollipop.lnote.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.lollipop.lnote.R
 
 class MainActivity : AppCompatActivity() {
 
