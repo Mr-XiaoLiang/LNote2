@@ -54,8 +54,9 @@ class SkinHelper<T: SkinInfo> {
             }
         }
 
-        fun add(vararg v: V) {
+        fun add(vararg v: V): ComponentGroup<T, V> {
             componentList.addAll(v)
+            return this
         }
 
     }
