@@ -1,13 +1,14 @@
 package com.lollipop.lnote.activity
 
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.lollipop.lnote.R
 import com.lollipop.lnote.skin.NoteSkin
 import com.lollipop.lnote.util.log
-import com.lollipop.lnote.util.stackTrace
 import com.lollipop.skin.SkinProvider
 import kotlinx.android.synthetic.main.activity_base.*
 
@@ -43,13 +44,30 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
             return layoutId == DEF_LAYOUT
         }
 
+    /**
+     * 展示返回按钮
+     */
+    protected var isShowBack = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (isDefLayout) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-        }
         super.onCreate(savedInstanceState)
         setContentView(if (layoutId == 0) { DEF_LAYOUT } else { layoutId })
         initScaffold()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        supportActionBar?.let {
+            it.setDisplayHomeAsUpEnabled(isShowBack)
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            onBackPressed()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     /**
@@ -63,6 +81,18 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
             if (floatingViewId != 0) {
                 layoutInflater.inflate(floatingViewId, floatingGroup, true)
             }
+            val attributes = window.attributes
+            attributes.systemUiVisibility = (
+                    attributes.systemUiVisibility or
+                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+            window.clearFlags(
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS or
+                        WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            window.statusBarColor = 0
+            window.navigationBarColor = 0
             setSupportActionBar(toolbar)
             initInsetCallback(rootGroup)
         }
@@ -82,17 +112,11 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
     protected fun onInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
         if (isDefLayout) {
             log("onInsetsChange($left, $top, $right, $bottom)")
-//            toolbar.layoutParams = (toolbar.layoutParams as
-//                    CollapsingToolbarLayout.LayoutParams).apply {
-//                setMargins(left, top, right, 0)
-//            }
-//            toolbar.layoutParams?.let {
-//                it as CollapsingToolbarLayout.LayoutParams
-//                log("toolbar.margin=(${it.leftMargin}, ${it.topMargin}, ${it.rightMargin}, ${it.bottomMargin})")
-//            }
-            Exception("调用栈").printStackTrace()
-            toolbar.setPadding(left, top, right, 0)
-            contentGroup.setPadding(left, 0, right, bottom)
+            toolbar.layoutParams = (toolbar.layoutParams as
+                    CollapsingToolbarLayout.LayoutParams).apply {
+                setMargins(left, top, right, 0)
+            }
+            contentGroup.setPadding(left, 0, right, 0)
             floatingGroup.setPadding(left, top, right, bottom)
         }
     }
