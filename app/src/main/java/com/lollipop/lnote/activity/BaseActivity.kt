@@ -81,24 +81,25 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
             if (floatingViewId != 0) {
                 layoutInflater.inflate(floatingViewId, floatingGroup, true)
             }
-            val attributes = window.attributes
-            attributes.systemUiVisibility = (
-                    attributes.systemUiVisibility or
-                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
-            window.clearFlags(
-                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS or
-                        WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            window.statusBarColor = 0
-            window.navigationBarColor = 0
             setSupportActionBar(toolbar)
             initInsetCallback(rootGroup)
         }
     }
 
     protected fun initInsetCallback(group: View) {
+        val attributes = window.attributes
+        attributes.systemUiVisibility = (
+                attributes.systemUiVisibility or
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+        window.clearFlags(
+            WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS or
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor = 0
+        window.navigationBarColor = 0
+
         group.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
         group.fitsSystemWindows = true
