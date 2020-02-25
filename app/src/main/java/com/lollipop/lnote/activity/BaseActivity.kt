@@ -5,6 +5,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.lollipop.lnote.R
 import com.lollipop.lnote.skin.NoteSkin
@@ -49,6 +50,8 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
      */
     protected var isShowBack = true
 
+    private var toolbarHeight = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(if (layoutId == 0) { DEF_LAYOUT } else { layoutId })
@@ -83,7 +86,27 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
             }
             setSupportActionBar(toolbar)
             initInsetCallback(rootGroup)
+            bindHeadImages()
         }
+    }
+
+    private fun bindHeadImages() {
+        appBarLayout.addOnOffsetChangedListener(
+            AppBarLayout.BaseOnOffsetChangedListener<AppBarLayout> {
+                layout, verticalOffset ->
+            val maxOffset = layout.totalScrollRange - toolbarHeight
+            blurHeadBg.alpha = (verticalOffset * -1F / maxOffset).range(0F, 1F)
+        })
+    }
+
+    private fun Float.range(min: Float, max: Float): Float {
+        if (this < min) {
+            return min
+        }
+        if (this > max) {
+            return max
+        }
+        return this
     }
 
     protected fun initInsetCallback(group: View) {
@@ -117,6 +140,7 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
                     CollapsingToolbarLayout.LayoutParams).apply {
                 setMargins(left, top, right, 0)
             }
+            toolbarHeight = toolbar.height + top
             contentGroup.setPadding(left, 0, right, 0)
             floatingGroup.setPadding(left, top, right, bottom)
         }
