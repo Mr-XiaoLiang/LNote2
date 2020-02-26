@@ -2,14 +2,21 @@ package com.lollipop.lnote.activity
 
 import android.graphics.Rect
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.lollipop.lnote.R
 import com.lollipop.lnote.skin.NoteSkin
+import com.lollipop.lnote.util.BingWallpaper
+import com.lollipop.lnote.util.GlideBlurTransformation
+import com.lollipop.lnote.util.PreferenceHelper.save
+import com.lollipop.lnote.util.PreferenceHelper.take
 import com.lollipop.lnote.util.log
 import com.lollipop.lnote.util.range
 import com.lollipop.skin.SkinProvider
@@ -25,6 +32,8 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
 
     companion object {
         private const val DEF_LAYOUT = R.layout.activity_base
+        private const val KEY_LAST_WALLPAPER = "KEY_LAST_WALLPAPER"
+        private const val KEY_LAST_WALLPAPER_INFO = "KEY_LAST_WALLPAPER_INFO"
     }
 
     /**
@@ -94,7 +103,35 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
             toolbar.post {
                 toolbarHeight = toolbar.height
             }
+            loadHeadWallpaper()
         }
+    }
+
+    private fun loadHeadWallpaper() {
+        // 先设置默认的
+        loadWallpaper(take(KEY_LAST_WALLPAPER, ""))
+        wallpaperCopyrightView.text = take(KEY_LAST_WALLPAPER_INFO, "")
+        // 加载新的
+        BingWallpaper.request {
+            if (BingWallpaper.isNotEmpty(it)) {
+                save(KEY_LAST_WALLPAPER, it.url)
+                save(KEY_LAST_WALLPAPER_INFO, it.copyright)
+                wallpaperCopyrightView.text = it.copyright
+                loadWallpaper(it.url)
+            }
+        }
+    }
+
+    private fun loadWallpaper(url: String) {
+        if (TextUtils.isEmpty(url)) {
+            wallpaperView.setImageDrawable(null)
+            blurWallpaperView.setImageDrawable(null)
+            return
+        }
+        Glide.with(this).load(url).into(wallpaperView)
+        Glide.with(this).load(url).apply(
+            RequestOptions.bitmapTransform(GlideBlurTransformation(this))
+        ).into(blurWallpaperView)
     }
 
     private fun bindHeadImages() {
@@ -102,7 +139,7 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
             AppBarLayout.BaseOnOffsetChangedListener<AppBarLayout> {
                 layout, verticalOffset ->
                 val maxOffset = layout.totalScrollRange - toolbarHeight - windowInset.top
-                blurHeadBg.alpha = (verticalOffset * -1F / maxOffset).range(0F, 1F)
+                blurWallpaperView.alpha = (verticalOffset * -1F / maxOffset).range(0F, 1F)
         })
     }
 

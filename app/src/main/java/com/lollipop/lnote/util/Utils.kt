@@ -1,8 +1,12 @@
 package com.lollipop.lnote.util
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import java.io.ByteArrayOutputStream
 import java.io.PrintWriter
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 import kotlin.math.min
 
 /**
@@ -63,4 +67,34 @@ fun Float.range(min: Float, max: Float): Float {
         return max
     }
     return this
+}
+
+private val threadPool: Executor by lazy {
+    Executors.newCachedThreadPool()
+}
+
+private val mainThread: Handler by lazy {
+    Handler(Looper.getMainLooper())
+}
+
+fun <T: Any> T.doAsync(error: ((Throwable) -> Unit)? = null,
+                run: T.() -> Unit) {
+    threadPool.execute {
+        try {
+            run.invoke(this)
+        } catch (e: Throwable) {
+            error?.invoke(e)
+        }
+    }
+}
+
+fun <T: Any> T.onUI(error: ((Throwable) -> Unit)? = null,
+                  run: T.() -> Unit) {
+    mainThread.post {
+        try {
+            run.invoke(this)
+        } catch (e: Throwable) {
+            error?.invoke(e)
+        }
+    }
 }

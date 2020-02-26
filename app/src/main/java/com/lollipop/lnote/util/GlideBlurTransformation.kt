@@ -32,5 +32,4 @@ class GlideBlurTransformation(private val context: Context) : CenterCrop() {
         return result
     }
 
-
 }
