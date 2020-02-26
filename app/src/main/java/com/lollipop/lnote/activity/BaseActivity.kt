@@ -1,5 +1,6 @@
 package com.lollipop.lnote.activity
 
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -10,6 +11,7 @@ import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.lollipop.lnote.R
 import com.lollipop.lnote.skin.NoteSkin
 import com.lollipop.lnote.util.log
+import com.lollipop.lnote.util.range
 import com.lollipop.skin.SkinProvider
 import kotlinx.android.synthetic.main.activity_base.*
 
@@ -52,6 +54,8 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
 
     private var toolbarHeight = 0
 
+    private var windowInset = Rect()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(if (layoutId == 0) { DEF_LAYOUT } else { layoutId })
@@ -87,6 +91,9 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
             setSupportActionBar(toolbar)
             initInsetCallback(rootGroup)
             bindHeadImages()
+            toolbar.post {
+                toolbarHeight = toolbar.height
+            }
         }
     }
 
@@ -94,19 +101,9 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
         appBarLayout.addOnOffsetChangedListener(
             AppBarLayout.BaseOnOffsetChangedListener<AppBarLayout> {
                 layout, verticalOffset ->
-            val maxOffset = layout.totalScrollRange - toolbarHeight
-            blurHeadBg.alpha = (verticalOffset * -1F / maxOffset).range(0F, 1F)
+                val maxOffset = layout.totalScrollRange - toolbarHeight - windowInset.top
+                blurHeadBg.alpha = (verticalOffset * -1F / maxOffset).range(0F, 1F)
         })
-    }
-
-    private fun Float.range(min: Float, max: Float): Float {
-        if (this < min) {
-            return min
-        }
-        if (this > max) {
-            return max
-        }
-        return this
     }
 
     protected fun initInsetCallback(group: View) {
@@ -136,11 +133,11 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
     protected fun onInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
         if (isDefLayout) {
             log("onInsetsChange($left, $top, $right, $bottom)")
+            windowInset.set(left, top, right, bottom)
             toolbar.layoutParams = (toolbar.layoutParams as
                     CollapsingToolbarLayout.LayoutParams).apply {
                 setMargins(left, top, right, 0)
             }
-            toolbarHeight = toolbar.height + top
             contentGroup.setPadding(left, 0, right, 0)
             floatingGroup.setPadding(left, top, right, bottom)
         }
