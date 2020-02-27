@@ -6,6 +6,12 @@
 
     <color name="headWallpaperForeground">#00FFFFFF</color>
 
+    <color name="iconColor">#E4E4E4</color>
+    <color name="iconColorNoBg">#333333</color>
+
+    <color name="btnTextColor">#E4E4E4</color>
+    <color name="btnTextColorNoBg">#333333</color>
+
     <color name="backgroundColor">#EEEEEE</color>
     <color name="noteItemTimerOfDay">#333333</color>
     <color name="noteItemTimerOfMonth">#DD333333</color>

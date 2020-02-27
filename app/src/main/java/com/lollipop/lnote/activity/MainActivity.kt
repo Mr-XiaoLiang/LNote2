@@ -8,7 +8,7 @@ import com.lollipop.lnote.skin.NoteSkin
  * @author Lollipop
  */
 class MainActivity : BaseActivity() {
-    override val floatingViewId = 0
+    override val floatingViewId = R.layout.activity_main_floating
     override val contentViewId = R.layout.activity_main
 
     override fun onSkinUpdate(info: NoteSkin) {
