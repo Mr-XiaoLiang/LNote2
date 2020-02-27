@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="colorPrimary">#00473F</color>
+    <color name="colorPrimaryDark">#002521</color>
+    <color name="colorAccent">#711033</color>
+
+    <color name="headWallpaperForeground">#33000000</color>
+
+    <color name="backgroundColor">#000000</color>
+    <color name="noteItemTimerOfDay">#AAAAAA</color>
+    <color name="noteItemTimerOfMonth">#CCAAAAAA</color>
+    <color name="noteItemCardColor">#252525</color>
+    <color name="noteItemLabelBackground">#454545</color>
+    <color name="noteItemTitle">#E4E4E4</color>
+    <color name="noteItemOverview">#DDE4E4E4</color>
+    <color name="noteItemExpenditure">#DD6E1717</color>
+    <color name="noteItemIncome">#DD12592E</color>
+    <color name="noteItemAlert">#DD77631A</color>
+
+</resources>

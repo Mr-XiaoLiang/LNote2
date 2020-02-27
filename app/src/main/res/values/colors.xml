@@ -3,4 +3,17 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+
+    <color name="headWallpaperForeground">#00FFFFFF</color>
+
+    <color name="backgroundColor">#EEEEEE</color>
+    <color name="noteItemTimerOfDay">#333333</color>
+    <color name="noteItemTimerOfMonth">#DD333333</color>
+    <color name="noteItemCardColor">#F3F3F3</color>
+    <color name="noteItemLabelBackground">#FFFFFF</color>
+    <color name="noteItemTitle">#303030</color>
+    <color name="noteItemOverview">#DD303030</color>
+    <color name="noteItemExpenditure">#DDD62929</color>
+    <color name="noteItemIncome">#DD22A857</color>
+    <color name="noteItemAlert">#DDD8B32E</color>
 </resources>

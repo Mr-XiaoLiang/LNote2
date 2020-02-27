@@ -4,15 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.MainActivity"
-    android:background="#8F00">
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <TextView
-            android:text="@string/app_name"
-            android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </androidx.core.widget.NestedScrollView>
+    tools:context=".activity.MainActivity">
+
+    <include layout="@layout/item_main_note"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
