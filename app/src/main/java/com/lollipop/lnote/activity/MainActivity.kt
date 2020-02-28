@@ -1,5 +1,6 @@
 package com.lollipop.lnote.activity
 
+import android.os.Bundle
 import com.lollipop.lnote.R
 import com.lollipop.lnote.skin.NoteSkin
 
@@ -10,6 +11,10 @@ import com.lollipop.lnote.skin.NoteSkin
 class MainActivity : BaseActivity() {
     override val floatingViewId = R.layout.activity_main_floating
     override val contentViewId = R.layout.activity_main
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onSkinUpdate(info: NoteSkin) {
     }

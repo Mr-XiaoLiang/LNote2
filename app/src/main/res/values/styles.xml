@@ -12,4 +12,11 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
+    <style name="AppTheme.Toolbar" parent="AppTheme">
+        <item name="android:textColorSecondary">@color/toolbarIcon</item>
+        <item name="titleTextColor">@color/toolbarTitle</item>
+        <item name="android:textColor">@color/toolbarTitle</item>
+        <item name="android:textColorPrimary">@color/toolbarTitle</item>
+    </style>
+    
 </resources>

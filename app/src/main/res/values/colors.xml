@@ -6,6 +6,9 @@
 
     <color name="headWallpaperForeground">#00FFFFFF</color>
 
+    <color name="toolbarIcon">#DDFFFFFF</color>
+    <color name="toolbarTitle">#FFFFFF</color>
+
     <color name="iconColor">#E4E4E4</color>
     <color name="iconColorNoBg">#333333</color>
 
