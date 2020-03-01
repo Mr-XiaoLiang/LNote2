@@ -207,12 +207,31 @@ class DbHelper(context: Context): SQLiteOpenHelper(context, DB_NAME, null, VERSI
 
     }
 
+    private object Sql {
+        const val PAGE_SIZE = 50
+        const val SELECT_NOTE_LIST = "SELECT " +
+                " ${Label.COLOR} , " +
+                " ${Note.ID} , " +
+                " ${Note.OVERVIEW} , " +
+                " ${Note.DATE} " +
+                " FROM ${Note.TABLE} " +
+                " LEFT JOIN ${Label.TABLE} " +
+                " ON ${Note.LABEL}  = ${Label.ID} " +
+                " ORDER BY ${Note.TIME} DESC " +
+                " Limit $PAGE_SIZE Offset ? "
+
+    }
+
     override fun onCreate(db: SQLiteDatabase?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        db?:return
+        db.execSQL(Label.CREATOR)
+        db.execSQL(Style.CREATOR)
+        db.execSQL(Note.CREATOR)
+        db.execSQL(FinanceLabel.CREATOR)
+        db.execSQL(Finance.CREATOR)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
 }

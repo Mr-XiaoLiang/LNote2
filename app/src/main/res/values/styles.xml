@@ -19,6 +19,8 @@
         <item name="titleTextColor">@color/toolbarTitle</item>
         <item name="android:textColor">@color/toolbarTitle</item>
         <item name="android:textColorPrimary">@color/toolbarTitle</item>
+        <item name="actionMenuTextColor">@color/toolbarTitle</item>
+        <item name="iconTint">@color/toolbarIcon</item>
     </style>
     
 </resources>

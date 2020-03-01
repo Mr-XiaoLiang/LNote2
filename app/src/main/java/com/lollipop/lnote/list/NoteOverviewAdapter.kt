@@ -11,7 +11,7 @@ import com.lollipop.lnote.info.NoteOverviewInfo
 class NoteOverviewAdapter(
     private val onClick: (NoteOverviewInfo) -> Unit): RecyclerView.Adapter<NoteOverviewHolder>() {
 
-    private val emptyInfo = NoteOverviewInfo(0, 0, "")
+    private val emptyInfo = NoteOverviewInfo(0, 0, 0, "")
 
     private val data: ArrayList<NoteOverviewInfo> = ArrayList()
 

@@ -52,7 +52,7 @@ class MainActivity : BaseActivity(),
     }
 
     private fun onNoteInfoClick(info: NoteOverviewInfo) {
-        Toast.makeText(this, "被点击了", Toast.LENGTH_SHORT).show()
+        NoteDetailActivity.start(this, info)
     }
 
     override fun onRefresh() {
