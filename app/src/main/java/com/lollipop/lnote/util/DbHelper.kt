@@ -42,7 +42,7 @@ class DbHelper(context: Context): SQLiteOpenHelper(context, DB_NAME, null, VERSI
         const val NAME = "${TAG}NAME"
 
         const val CREATOR = "CREATE TABLE $TABLE (  " +
-                " $ID INTEGER PRIMARY KEY,  " +
+                " $ID INTEGER PRIMARY KEY ,  " +
                 " $COLOR INTEGER ,  " +
                 " $NAME VARCHAR " +
                 " );"
@@ -78,7 +78,7 @@ class DbHelper(context: Context): SQLiteOpenHelper(context, DB_NAME, null, VERSI
         const val NAME = "${TAG}NAME"
 
         const val CREATOR = "CREATE TABLE $TABLE (  " +
-                " $ID INTEGER PRIMARY KEY,  " +
+                " $ID INTEGER PRIMARY KEY ,  " +
                 " $TYPE VARCHAR ,  " +
                 " $INFO VARCHAR ,  " +
                 " $NAME VARCHAR " +
@@ -123,13 +123,88 @@ class DbHelper(context: Context): SQLiteOpenHelper(context, DB_NAME, null, VERSI
         const val OVERVIEW = "${TAG}OVERVIEW"
 
         const val CREATOR = "CREATE TABLE $TABLE (  " +
-                " $ID INTEGER PRIMARY KEY,  " +
+                " $ID INTEGER PRIMARY KEY ,  " +
                 " $LABEL INTEGER ,  " +
                 " $INFO VARCHAR ,  " +
                 " $DATE INTEGER , " +
                 " $TIME INTEGER , " +
                 " $OVERVIEW VARCHAR " +
                 " );"
+    }
+
+    /**
+     * 收支类型
+     */
+    private object FinanceLabel {
+        /**
+         * 表前缀
+         */
+        private const val TAG = "FINANCE_LABEL_"
+        /**
+         * 表名
+         */
+        const val TABLE = "${TAG}TABLE"
+        /**
+         * ID
+         */
+        const val ID = "${TAG}ID"
+        /**
+         * 颜色值
+         */
+        const val COLOR = "${TAG}COLOR"
+        /**
+         * 名字
+         */
+        const val NAME = "${TAG}NAME"
+
+        const val CREATOR = "CREATE TABLE $TABLE (  " +
+                " $ID INTEGER PRIMARY KEY ,  " +
+                " $COLOR INTEGER ,  " +
+                " $NAME VARCHAR " +
+                " );"
+    }
+
+    /**
+     * 流水表
+     */
+    private object Finance {
+        /**
+         * 表前缀
+         */
+        private const val TAG = "FINANCE_"
+        /**
+         * 表名
+         */
+        const val TABLE = "${TAG}TABLE"
+        /**
+         * ID
+         */
+        const val ID = "${TAG}ID"
+        /**
+         * 流水类型
+         */
+        const val TYPE = "${TAG}TYPE"
+        /**
+         * 金额（单位：分）
+         */
+        const val AMOUNT = "${TAG}AMOUNT"
+        /**
+         * 日期
+         */
+        const val DATE = "${TAG}DATE"
+        /**
+         * 时间戳
+         */
+        const val TIME = "${TAG}TIME"
+
+        const val CREATOR = "CREATE TABLE $TABLE (  " +
+                " $ID INTEGER PRIMARY KEY ,  " +
+                " $TYPE INTEGER ,  " +
+                " $DATE INTEGER , " +
+                " $TIME INTEGER , " +
+                " $AMOUNT INTEGER " +
+                " );"
+
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
