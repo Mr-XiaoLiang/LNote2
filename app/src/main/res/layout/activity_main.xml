@@ -6,10 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".activity.MainActivity">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/noteList"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/noteList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <include layout="@layout/item_main_note_time"
         android:id="@+id/floatingListTimer"

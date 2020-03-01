@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.lollipop.lnote.R
 import com.lollipop.lnote.info.NoteOverviewInfo
 import com.lollipop.lnote.list.NoteOverviewAdapter
@@ -17,7 +18,8 @@ import kotlin.collections.ArrayList
  * 主页的Activity
  * @author Lollipop
  */
-class MainActivity : BaseActivity() {
+class MainActivity : BaseActivity(),
+    SwipeRefreshLayout.OnRefreshListener{
     override val floatingViewId = R.layout.activity_main_floating
     override val contentViewId = R.layout.activity_main
 
@@ -33,22 +35,31 @@ class MainActivity : BaseActivity() {
         noteList.adapter = adapter
         noteList.layoutManager = LinearLayoutManager(
             this, RecyclerView.VERTICAL, false)
+        refreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary)
+        refreshLayout.setOnRefreshListener(this)
         bindFloatingDate()
-        initData()
+        onRefresh()
     }
 
     private fun bindFloatingDate() {
         val timerView: View = findViewById(R.id.floatingListTimer)
         val dayView: TextView = findViewById(R.id.dayView)
         val monthView: TextView = findViewById(R.id.monthView)
-        noteList.addOnScrollListener(FloatingDateListener(timerView, dayView, monthView, adapter))
+        noteList.addOnScrollListener(FloatingDateListener(timerView, dayView, monthView, adapter) {
+            loadMoreData()
+        })
     }
 
     private fun onNoteInfoClick(info: NoteOverviewInfo) {
 
     }
 
-    private fun initData() {
+    override fun onRefresh() {
+        if (isLoading) {
+            return
+        }
+        startLoading()
+        refreshLayout.isRefreshing = true
         pageIndex = 0
         val infoList = ArrayList<NoteOverviewInfo>()
         val random = Random()
@@ -63,9 +74,15 @@ class MainActivity : BaseActivity() {
             infoList.add(NoteOverviewInfo(index, 20200301 + index / 3, json.toString()))
         }
         adapter.reset(infoList)
+        stopLoading()
+        refreshLayout.isRefreshing = false
     }
 
     private fun loadMoreData() {
+        if (isLoading) {
+            return
+        }
+        startLoading()
         pageIndex ++
         val infoList = ArrayList<NoteOverviewInfo>()
         val random = Random()
@@ -80,13 +97,15 @@ class MainActivity : BaseActivity() {
             infoList.add(NoteOverviewInfo(index, 20200301 + index / 3, json.toString()))
         }
         adapter.addData(infoList)
+        stopLoading()
     }
 
     private class FloatingDateListener(
         private val timerView: View,
         private val dayView: TextView,
         private val monthView: TextView,
-        private val adapter: NoteOverviewAdapter): RecyclerView.OnScrollListener() {
+        private val adapter: NoteOverviewAdapter,
+        private val loadMore: () -> Unit): RecyclerView.OnScrollListener() {
 
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
@@ -106,6 +125,10 @@ class MainActivity : BaseActivity() {
                     timerView.translationY = if (top > height) { 0F } else { top - height }
                 } else {
                     timerView.translationY = 0F
+                }
+
+                if (adapter.itemCount - layoutManager.findLastVisibleItemPosition() < 5) {
+                    loadMore()
                 }
             }
         }

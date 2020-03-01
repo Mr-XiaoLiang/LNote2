@@ -65,6 +65,9 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
 
     private var windowInset = Rect()
 
+    protected var isLoading = false
+        private set
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(if (layoutId == 0) { DEF_LAYOUT } else { layoutId })
@@ -183,12 +186,14 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
     }
 
     protected fun startLoading() {
+        isLoading = true
         if (isDefLayout) {
             contentLoading.show()
         }
     }
 
     protected fun stopLoading() {
+        isLoading = false
         if (isDefLayout) {
             contentLoading.hide()
         }
