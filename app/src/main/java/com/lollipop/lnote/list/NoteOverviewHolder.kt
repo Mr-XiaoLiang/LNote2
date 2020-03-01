@@ -52,8 +52,10 @@ class NoteOverviewHolder private
         }
     }
 
-    private val labelView: ImageView by lazy {
-        itemView.findViewById<ImageView>(R.id.noteLabelView)
+    private val labelDrawable: ColorDrawable by lazy {
+        val drawable = ColorDrawable()
+        itemView.findViewById<ImageView>(R.id.noteLabelView).setImageDrawable(drawable)
+        drawable
     }
 
     private val titleView: TextView by lazy {
@@ -99,14 +101,7 @@ class NoteOverviewHolder private
         monthView.text = info.monthStr
 
         cardView.visibility = View.VISIBLE
-        labelView.apply {
-            val d = drawable
-            if (d != null && d is ColorDrawable) {
-                d.color = info.labelColor
-            } else {
-                setImageDrawable(ColorDrawable(info.labelColor))
-            }
-        }
+        labelDrawable.color = info.labelColor
         titleView.text = info.title
         overviewView.text = info.overview
         expenditureView.isShow(info.isExpenditure)

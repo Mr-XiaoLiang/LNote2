@@ -24,6 +24,12 @@ class NoteOverviewAdapter(
         notifyItemRangeInserted(startRange, infoList.size)
     }
 
+    fun reset(infoList: ArrayList<NoteOverviewInfo>) {
+        data.clear()
+        data.addAll(infoList)
+        notifyDataSetChanged()
+    }
+
     fun getItem(position: Int): NoteOverviewInfo? {
         if (position < 0 || position >= data.size) {
             return null
@@ -41,14 +47,14 @@ class NoteOverviewAdapter(
     }
 
     override fun getItemCount(): Int {
-        return data.size + 1
+        return data.size + 2
     }
 
     override fun onBindViewHolder(holder: NoteOverviewHolder, position: Int) {
         holder.onBind(getItem(position)?:emptyInfo)
     }
 
-    private fun isShowDate(position: Int): Boolean {
+    fun isShowDate(position: Int): Boolean {
         if (position < 1) {
             return true
         }

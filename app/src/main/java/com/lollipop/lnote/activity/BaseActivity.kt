@@ -104,6 +104,8 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
                 toolbarHeight = toolbar.height
             }
             loadHeadWallpaper()
+            contentLoading.putColorForRes(R.color.colorPrimary,
+                R.color.colorAccent, R.color.toolbarIcon)
         }
     }
 
@@ -177,6 +179,24 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
             }
             contentGroup.setPadding(left, 0, right, 0)
             floatingGroup.setPadding(left, top, right, bottom)
+        }
+    }
+
+    protected fun startLoading() {
+        if (isDefLayout) {
+            contentLoading.show()
+        }
+    }
+
+    protected fun stopLoading() {
+        if (isDefLayout) {
+            contentLoading.hide()
+        }
+    }
+
+    override fun onSkinUpdate(info: NoteSkin) {
+        if (isDefLayout) {
+            contentLoading.putColorForRes(R.color.colorPrimary, R.color.colorAccent)
         }
     }
 
