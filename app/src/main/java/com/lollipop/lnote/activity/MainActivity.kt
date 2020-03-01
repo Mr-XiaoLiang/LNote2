@@ -3,6 +3,7 @@ package com.lollipop.lnote.activity
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -51,7 +52,7 @@ class MainActivity : BaseActivity(),
     }
 
     private fun onNoteInfoClick(info: NoteOverviewInfo) {
-
+        Toast.makeText(this, "被点击了", Toast.LENGTH_SHORT).show()
     }
 
     override fun onRefresh() {
@@ -65,13 +66,12 @@ class MainActivity : BaseActivity(),
         val random = Random()
         for (index in 1..30) {
             val json = JSONObject()
-            json.put("LABEL_COLOR", random.nextInt())
             json.put("TITLE", "TITLE$index")
             json.put("OVERVIEW", "OVERVIEW, OVERVIEW, OVERVIEW, OVERVIEW, OVERVIEW,OVERVIEW$index")
             json.put("EXPENDITURE", index % 2 == 0)
             json.put("INCOME", index % 3 == 0)
             json.put("ALERT", index % 4 == 0)
-            infoList.add(NoteOverviewInfo(index, 20200301 + index / 3, json.toString()))
+            infoList.add(NoteOverviewInfo(index, 20200301 + index / 3, random.nextInt(), json.toString()))
         }
         adapter.reset(infoList)
         stopLoading()
@@ -94,7 +94,7 @@ class MainActivity : BaseActivity(),
             json.put("EXPENDITURE", index % 2 == 0)
             json.put("INCOME", index % 3 == 0)
             json.put("ALERT", index % 4 == 0)
-            infoList.add(NoteOverviewInfo(index, 20200301 + index / 3, json.toString()))
+            infoList.add(NoteOverviewInfo(index, 20200301 + index / 3, random.nextInt(), json.toString()))
         }
         adapter.addData(infoList)
         stopLoading()

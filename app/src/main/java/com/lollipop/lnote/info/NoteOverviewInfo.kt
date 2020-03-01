@@ -10,10 +10,9 @@ import org.json.JSONObject
  * @date 2020/2/29 23:07
  * 笔记概览信息
  */
-class NoteOverviewInfo(val id: Int, val date: Int, val info: String) {
+class NoteOverviewInfo(val id: Int, val date: Int, val labelColor: Int, val info: String) {
 
     companion object {
-        private const val LABEL_COLOR = "LABEL_COLOR"
         private const val TITLE = "TITLE"
         private const val OVERVIEW = "OVERVIEW"
         private const val EXPENDITURE = "EXPENDITURE"
@@ -30,11 +29,6 @@ class NoteOverviewInfo(val id: Int, val date: Int, val info: String) {
             JSONObject()
         }
     }
-
-    /**
-     * 标签颜色
-     */
-    val labelColor = infoObject.optInt(LABEL_COLOR, Color.TRANSPARENT)
 
     /**
      * 标题

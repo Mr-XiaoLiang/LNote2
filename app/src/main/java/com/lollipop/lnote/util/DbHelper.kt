@@ -40,6 +40,12 @@ class DbHelper(context: Context): SQLiteOpenHelper(context, DB_NAME, null, VERSI
          * 名字
          */
         const val NAME = "${TAG}NAME"
+
+        const val CREATOR = "CREATE TABLE $TABLE (  " +
+                " $ID INTEGER PRIMARY KEY,  " +
+                " $COLOR INTEGER ,  " +
+                " $NAME VARCHAR " +
+                " );"
     }
 
     /**
@@ -70,6 +76,13 @@ class DbHelper(context: Context): SQLiteOpenHelper(context, DB_NAME, null, VERSI
          * 样式名
          */
         const val NAME = "${TAG}NAME"
+
+        const val CREATOR = "CREATE TABLE $TABLE (  " +
+                " $ID INTEGER PRIMARY KEY,  " +
+                " $TYPE VARCHAR ,  " +
+                " $INFO VARCHAR ,  " +
+                " $NAME VARCHAR " +
+                " );"
     }
 
     /**
@@ -104,6 +117,19 @@ class DbHelper(context: Context): SQLiteOpenHelper(context, DB_NAME, null, VERSI
          * 时间戳
          */
         const val TIME = "${TAG}TIME"
+        /**
+         * 概览信息
+         */
+        const val OVERVIEW = "${TAG}OVERVIEW"
+
+        const val CREATOR = "CREATE TABLE $TABLE (  " +
+                " $ID INTEGER PRIMARY KEY,  " +
+                " $LABEL INTEGER ,  " +
+                " $INFO VARCHAR ,  " +
+                " $DATE INTEGER , " +
+                " $TIME INTEGER , " +
+                " $OVERVIEW VARCHAR " +
+                " );"
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
