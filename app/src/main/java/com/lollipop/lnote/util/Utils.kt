@@ -98,3 +98,17 @@ fun <T: Any> T.onUI(error: ((Throwable) -> Unit)? = null,
         }
     }
 }
+
+fun String.numberFormat(length: Int = 2): String {
+    if (this.length >= length) {
+        return this
+    }
+    if (this.length == length - 1) {
+        return "0$this"
+    }
+    val builder = StringBuilder(this)
+    while (builder.length < length) {
+        builder.insert(0, "0")
+    }
+    return builder.toString()
+}

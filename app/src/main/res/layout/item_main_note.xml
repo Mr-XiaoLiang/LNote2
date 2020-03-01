@@ -5,8 +5,10 @@
     android:orientation="horizontal"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <include
+        android:id="@+id/timerView"
         layout="@layout/item_main_note_time"/>
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardView"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
