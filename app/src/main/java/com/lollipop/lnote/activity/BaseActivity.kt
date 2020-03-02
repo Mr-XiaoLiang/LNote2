@@ -17,7 +17,6 @@ import com.lollipop.lnote.util.BingWallpaper
 import com.lollipop.lnote.util.GlideBlurTransformation
 import com.lollipop.lnote.util.PreferenceHelper.save
 import com.lollipop.lnote.util.PreferenceHelper.take
-import com.lollipop.lnote.util.log
 import com.lollipop.lnote.util.range
 import com.lollipop.skin.SkinProvider
 import kotlinx.android.synthetic.main.activity_base.*
@@ -31,7 +30,6 @@ import kotlinx.android.synthetic.main.activity_base.*
 abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
 
     companion object {
-        private const val DEF_LAYOUT = R.layout.activity_base
         private const val KEY_LAST_WALLPAPER = "KEY_LAST_WALLPAPER"
         private const val KEY_LAST_WALLPAPER_INFO = "KEY_LAST_WALLPAPER_INFO"
     }
@@ -49,12 +47,7 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
     /**
      * 内容框架的View的ID
      */
-    protected var layoutId = DEF_LAYOUT
-
-    private val isDefLayout: Boolean
-        get() {
-            return layoutId == DEF_LAYOUT
-        }
+    private val layoutId = R.layout.activity_base
 
     /**
      * 展示返回按钮
@@ -70,15 +63,13 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(if (layoutId == 0) { DEF_LAYOUT } else { layoutId })
+        setContentView(layoutId)
         initScaffold()
     }
 
     override fun onStart() {
         super.onStart()
-        supportActionBar?.let {
-            it.setDisplayHomeAsUpEnabled(isShowBack)
-        }
+        supportActionBar?.setDisplayHomeAsUpEnabled(isShowBack)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -93,23 +84,21 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
      * 初始化脚手架
      */
     private fun initScaffold() {
-        if (isDefLayout) {
-            if (contentViewId != 0) {
-                layoutInflater.inflate(contentViewId, contentGroup, true)
-            }
-            if (floatingViewId != 0) {
-                layoutInflater.inflate(floatingViewId, floatingGroup, true)
-            }
-            setSupportActionBar(toolbar)
-            initInsetCallback(rootGroup)
-            bindHeadImages()
-            toolbar.post {
-                toolbarHeight = toolbar.height
-            }
-            loadHeadWallpaper()
-            contentLoading.putColorForRes(R.color.colorPrimary,
-                R.color.colorAccent, R.color.toolbarIcon)
+        if (contentViewId != 0) {
+            layoutInflater.inflate(contentViewId, contentGroup, true)
         }
+        if (floatingViewId != 0) {
+            layoutInflater.inflate(floatingViewId, floatingGroup, true)
+        }
+        setSupportActionBar(toolbar)
+        initInsetCallback(rootGroup)
+        bindHeadImages()
+        toolbar.post {
+            toolbarHeight = toolbar.height
+        }
+        loadHeadWallpaper()
+        contentLoading.putColorForRes(R.color.colorPrimary,
+            R.color.colorAccent, R.color.toolbarIcon)
     }
 
     private fun loadHeadWallpaper() {
@@ -148,7 +137,7 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
         })
     }
 
-    protected fun initInsetCallback(group: View) {
+    private fun initInsetCallback(group: View) {
         val attributes = window.attributes
         attributes.systemUiVisibility = (
                 attributes.systemUiVisibility or
@@ -172,37 +161,28 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
         }
     }
 
-    protected fun onInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
-        if (isDefLayout) {
-            log("onInsetsChange($left, $top, $right, $bottom)")
-            windowInset.set(left, top, right, bottom)
-            toolbar.layoutParams = (toolbar.layoutParams as
-                    CollapsingToolbarLayout.LayoutParams).apply {
-                setMargins(left, top, right, 0)
-            }
-            contentGroup.setPadding(left, 0, right, 0)
-            floatingGroup.setPadding(left, top, right, bottom)
+    protected open fun onInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
+        windowInset.set(left, top, right, bottom)
+        toolbar.layoutParams = (toolbar.layoutParams as
+                CollapsingToolbarLayout.LayoutParams).apply {
+            setMargins(left, top, right, 0)
         }
+        contentGroup.setPadding(left, 0, right, 0)
+        floatingGroup.setPadding(left, top, right, bottom)
     }
 
     protected fun startLoading() {
         isLoading = true
-        if (isDefLayout) {
-            contentLoading.show()
-        }
+        contentLoading.show()
     }
 
     protected fun stopLoading() {
         isLoading = false
-        if (isDefLayout) {
-            contentLoading.hide()
-        }
+        contentLoading.hide()
     }
 
     override fun onSkinUpdate(info: NoteSkin) {
-        if (isDefLayout) {
-            contentLoading.putColorForRes(R.color.colorPrimary, R.color.colorAccent)
-        }
+        contentLoading.putColorForRes(R.color.colorPrimary, R.color.colorAccent)
     }
 
 }
