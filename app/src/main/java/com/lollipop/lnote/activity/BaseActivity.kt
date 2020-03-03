@@ -15,6 +15,7 @@ import com.lollipop.lnote.R
 import com.lollipop.lnote.skin.NoteSkin
 import com.lollipop.lnote.util.BingWallpaper
 import com.lollipop.lnote.util.GlideBlurTransformation
+import com.lollipop.lnote.util.NotificationHelper
 import com.lollipop.lnote.util.PreferenceHelper.save
 import com.lollipop.lnote.util.PreferenceHelper.take
 import com.lollipop.lnote.util.range
@@ -99,6 +100,7 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
         loadHeadWallpaper()
         contentLoading.putColorForRes(R.color.colorPrimary,
             R.color.colorAccent, R.color.toolbarIcon)
+//        NotificationHelper(fullScreenGroup)
     }
 
     private fun loadHeadWallpaper() {
