@@ -4,10 +4,13 @@ import android.content.res.ColorStateList
 import android.os.Handler
 import android.text.TextUtils
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import com.google.android.material.behavior.SwipeDismissBehavior
 import com.google.android.material.button.MaterialButton
 import com.lollipop.lnote.R
 
@@ -50,12 +53,48 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
         notificationContent = panelView.findViewById(R.id.notificationContent)
         actionBtn = panelView.findViewById(R.id.actionBtn)
         initView()
+        val layoutParams = panelView.layoutParams
+        if (layoutParams is CoordinatorLayout.LayoutParams) {
+            setUpBehavior(layoutParams)
+        }
     }
 
     private fun initView() {
         panelView.visibility = View.INVISIBLE
         actionBtn.setOnClickListener(this)
         panelView.addOnAttachStateChangeListener(this)
+    }
+
+    private fun setUpBehavior(layoutParams: CoordinatorLayout.LayoutParams) {
+        val behavior = Behavior { isDrag ->
+            if (isDrag) {
+                pauseTimeout()
+            } else {
+                restoreTimeout()
+            }
+        }
+
+        behavior.listener = object : SwipeDismissBehavior.OnDismissListener {
+            override fun onDismiss(view: View) {
+                doDismiss(DismissType.Remove)
+            }
+
+            override fun onDragStateChanged(state: Int) {
+                when (state) {
+                    SwipeDismissBehavior.STATE_DRAGGING, SwipeDismissBehavior.STATE_SETTLING -> {
+                        // If the view is being dragged or settling, pause the timeout
+                        pauseTimeout()
+                    }
+                    SwipeDismissBehavior.STATE_IDLE -> {
+                        // If the view has been released and is idle, restore the timeout
+                        restoreTimeout()
+                    }
+                    else -> {
+                    }
+                }
+            }
+        }
+        layoutParams.behavior = behavior
     }
 
     fun onInsetChange(left: Int, top: Int, right: Int, bottom: Int) {
@@ -74,6 +113,14 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
               onDismiss: ((DismissType) -> Unit)? = null) {
         updateByAlert()
         updateValue(value, icon, action, onClick, onDismiss)
+    }
+
+    private fun pauseTimeout() {
+        messageHandler.removeMessages(WHAT_TIMEOUT)
+    }
+
+    private fun restoreTimeout() {
+        messageHandler.sendEmptyMessageDelayed(WHAT_TIMEOUT, timeOut)
     }
 
     private fun updateValue(value: CharSequence, icon: Int = 0, action: CharSequence = "",
@@ -117,13 +164,13 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
     }
 
     private fun doDismiss(dismissType: DismissType) {
-        messageHandler.removeMessages(WHAT_TIMEOUT)
+        pauseTimeout()
         onDismiss(dismissType)
     }
 
     private fun onShow() {
         doDismiss(DismissType.Replace)
-        messageHandler.sendEmptyMessageDelayed(WHAT_TIMEOUT, timeOut)
+        restoreTimeout()
         // TODO
     }
 
@@ -158,6 +205,46 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
          * 被顶替
          */
         Replace
+    }
+
+    private class Behavior(callback: (isDrag: Boolean) -> Unit) : SwipeDismissBehavior<View>() {
+        private val delegate = BehaviorDelegate(this, callback)
+
+        override fun canSwipeDismissView(child: View): Boolean {
+            return true
+        }
+
+        override fun onInterceptTouchEvent(parent: CoordinatorLayout,
+                                           child: View, event: MotionEvent): Boolean {
+            delegate.onInterceptTouchEvent(parent, child, event)
+            return super.onInterceptTouchEvent(parent, child, event)
+        }
+    }
+
+    private class BehaviorDelegate(behavior: SwipeDismissBehavior<*>,
+        private val managerCallback: (isDrag: Boolean) -> Unit) {
+
+        fun onInterceptTouchEvent(parent: CoordinatorLayout, child: View, event: MotionEvent) {
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN ->
+                    // We want to make sure that we disable any Snackbar timeouts if the user is
+                    // currently touching the Snackbar. We restore the timeout when complete
+                    if (parent.isPointInChildBounds(child, event.x.toInt(), event.y.toInt())) {
+                        managerCallback.invoke(true)
+                    }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    managerCallback.invoke(false)
+                }
+                else -> {
+                }
+            }
+        }
+
+        init {
+            behavior.setStartAlphaSwipeDistance(0.1f)
+            behavior.setEndAlphaSwipeDistance(0.6f)
+            behavior.setSwipeDirection(SwipeDismissBehavior.SWIPE_DIRECTION_START_TO_END)
+        }
     }
 
 }
