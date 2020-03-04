@@ -25,4 +25,14 @@
     <color name="noteItemExpenditure">#DDD62929</color>
     <color name="noteItemIncome">#DD22A857</color>
     <color name="noteItemAlert">#DDD8B32E</color>
+
+    <color name="topNotificationBackground">@color/colorPrimary</color>
+    <color name="topNotificationContent">@android:color/white</color>
+    <color name="topNotificationAction">@color/colorAccent</color>
+    <color name="topNotificationIcon">@android:color/white</color>
+
+    <color name="topAlertBackground">#DDAE2020</color>
+    <color name="topAlertContent">#DDFFFFFF</color>
+    <color name="topAlertAction">@color/toolbarIcon</color>
+    <color name="topAlertIcon">@color/colorPrimary</color>
 </resources>

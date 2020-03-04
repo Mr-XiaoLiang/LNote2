@@ -27,4 +27,13 @@
     <color name="noteItemIncome">#DD12592E</color>
     <color name="noteItemAlert">#DD77631A</color>
 
+    <color name="topNotificationBackground">@color/colorPrimary</color>
+    <color name="topNotificationContent">#DDFFFFFF</color>
+    <color name="topNotificationAction">@color/toolbarIcon</color>
+    <color name="topNotificationIcon">@color/toolbarIcon</color>
+
+    <color name="topAlertBackground">#DD6E1717</color>
+    <color name="topAlertContent">#DDFFFFFF</color>
+    <color name="topAlertAction">@color/toolbarIcon</color>
+    <color name="topAlertIcon">@color/toolbarIcon</color>
 </resources>
