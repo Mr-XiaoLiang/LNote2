@@ -31,7 +31,7 @@
     <color name="topNotificationAction">@color/colorAccent</color>
     <color name="topNotificationIcon">@android:color/white</color>
 
-    <color name="topAlertBackground">#DDAE2020</color>
+    <color name="topAlertBackground">#9F1F1F</color>
     <color name="topAlertContent">#DDFFFFFF</color>
     <color name="topAlertAction">@color/toolbarIcon</color>
     <color name="topAlertIcon">@color/colorPrimary</color>

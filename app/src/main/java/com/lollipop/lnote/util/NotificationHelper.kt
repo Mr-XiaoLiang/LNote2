@@ -1,6 +1,7 @@
 package com.lollipop.lnote.util
 
 import android.content.res.ColorStateList
+import android.graphics.PointF
 import android.os.Handler
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -9,12 +10,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.Guideline
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.behavior.SwipeDismissBehavior
 import com.google.android.material.button.MaterialButton
 import com.lollipop.lnote.R
+import kotlin.math.abs
 
 /**
  * @author lollipop
@@ -39,6 +39,9 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
     private var pendingInfo: Info? = null
     private var isShown = false
 
+    private val touchDownPoint = PointF()
+    private var touchPointId = 0
+
     private val notificationIconTint: ColorStateList by lazy {
         ColorStateList.valueOf(context.compatColor(R.color.topNotificationIcon))
     }
@@ -48,28 +51,26 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
 
     init {
         panelView = LayoutInflater.from(context).inflate(
-            R.layout.fragment_notification, group, true)
+            R.layout.fragment_notification, group, false)
+        group.addView(panelView)
         notificationIcon = panelView.findViewById(R.id.notificationIcon)
         notificationContent = panelView.findViewById(R.id.notificationContent)
         actionBtn = panelView.findViewById(R.id.actionBtn)
         initView()
-        val layoutParams = panelView.layoutParams
-        if (layoutParams is CoordinatorLayout.LayoutParams) {
-            setUpBehavior(layoutParams)
-        }
     }
 
     private val showTask = Runnable {
+        panelView.translationX = 0F
         panelView.translationY = panelView.height * -1F
         val animator = panelView.animate()
         animator.cancel()
         animator.translationY(0F)
         animator.lifecycleBinding {
             onStart {
+                removeThis(it)
                 if (panelView.visibility != View.VISIBLE) {
                     panelView.visibility = View.VISIBLE
                 }
-                removeThis(it)
             }
         }
         animator.start()
@@ -81,10 +82,10 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
         animator.translationY(panelView.height * -1F)
         animator.lifecycleBinding {
             onEnd {
-                if (pendingInfo == null) {
+                removeThis(it)
+                if (!showNext()) {
                     panelView.visibility = View.INVISIBLE
                 }
-                removeThis(it)
             }
         }
         animator.start()
@@ -95,12 +96,54 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
     }
 
     private fun initView() {
-//        panelView.visibility = View.INVISIBLE
+        panelView.visibility = View.INVISIBLE
         actionBtn.setOnClickListener(this)
         panelView.addOnAttachStateChangeListener(this)
+        panelView.setOnTouchListener { _, event ->
+            // 拦截所有触摸事件，避免触摸穿透的同时，增加手指滑动移除
+//            onPanelTouch(event)
+            true
+        }
+        setUpBehavior()
     }
 
-    private fun setUpBehavior(layoutParams: CoordinatorLayout.LayoutParams) {
+    private fun onPanelTouch(event: MotionEvent) {
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                pauseTimeout()
+                touchPointId = event.getPointerId(0)
+                touchDownPoint.set(event.getXByPoint(), event.getYByPoint())
+            }
+            MotionEvent.ACTION_POINTER_UP -> {
+                val index = event.findPointerIndex(touchPointId)
+                if (index < 0) {
+                    touchPointId = event.getPointerId(0)
+                    touchDownPoint.set(event.getXByPoint(), event.getYByPoint())
+                }
+            }
+            MotionEvent.ACTION_MOVE -> {
+                val x = event.getXByPoint()
+                val y = event.getYByPoint()
+                if (y >= 0 || y <= panelView.height) {
+                    panelView.translationX += x - touchDownPoint.x
+                }
+                touchDownPoint.x = x
+                log("event.x=${event.getXByPoint()}, touchDownPoint.x=${touchDownPoint.x}")
+            }
+            MotionEvent.ACTION_UP -> {
+                checkSwipe()
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                swipeOut(0)
+            }
+        }
+    }
+
+    private fun setUpBehavior() {
+        val layoutParams = panelView.layoutParams
+        if (layoutParams !is CoordinatorLayout.LayoutParams) {
+            return
+        }
         val behavior = Behavior { isDrag ->
             if (isDrag) {
                 pauseTimeout()
@@ -132,10 +175,46 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
         layoutParams.behavior = behavior
     }
 
-    fun onInsetChange(left: Int, top: Int, right: Int, bottom: Int) {
-        panelView.findViewById<Guideline>(R.id.leftGuideline).setGuidelineBegin(left)
-        panelView.findViewById<Guideline>(R.id.rightGuideline).setGuidelineBegin(right)
-        panelView.findViewById<Guideline>(R.id.topGuideline).setGuidelineBegin(top)
+    private fun checkSwipe() {
+        val offset = panelView.translationX.toInt()
+        swipeOut(if (abs(offset) < panelView.width / 2) { 0 } else { offset % 2 })
+    }
+
+    private fun swipeOut(direction: Int) {
+        panelView.animate().let { animator ->
+            animator.cancel()
+            animator.translationX(direction * panelView.width * 1F)
+                .lifecycleBinding {
+                onEnd {
+                    removeThis(it)
+                    if (direction == 0) {
+                        restoreTimeout()
+                    } else {
+                        doDismiss(DismissType.Remove)
+                    }
+                }
+            }.start()
+        }
+    }
+
+    private fun MotionEvent.getXByPoint(): Float {
+        val index = findPointerIndex(touchPointId)
+        if (index < 0) {
+            return 0F
+        }
+        return getX(index)
+    }
+
+    private fun MotionEvent.getYByPoint(): Float {
+        val index = findPointerIndex(touchPointId)
+        if (index < 0) {
+            return 0F
+        }
+        return getY(index)
+    }
+
+    fun onInsetChange(left: Int, top: Int, right: Int) {
+        panelView.setPadding(left, top, right, 0)
     }
 
     fun notify(value: CharSequence, icon: Int = 0, action: CharSequence = "",
@@ -166,6 +245,14 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
         }
         updateValue(value, icon, action, onClick, onDismiss)
         doShow()
+    }
+
+    private fun showNext(): Boolean {
+        val info = pendingInfo
+        pendingInfo = null
+        info?:return false
+        showWith(info.isAlert, info.value, info.icon, info.action, info.onClick, info.onDismiss)
+        return true
     }
 
     private fun pauseTimeout() {
@@ -223,6 +310,8 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
         panelView.removeCallbacks(hideTask)
         panelView.removeCallbacks(showTask)
         if (dismissType == DismissType.Remove) {
+            panelView.left = 0
+            panelView.alpha = 1F
             panelView.visibility = View.INVISIBLE
             return
         }
@@ -292,7 +381,7 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
     }
 
     private class BehaviorDelegate(behavior: SwipeDismissBehavior<*>,
-        private val managerCallback: (isDrag: Boolean) -> Unit) {
+                                   private val managerCallback: (isDrag: Boolean) -> Unit) {
 
         fun onInterceptTouchEvent(parent: CoordinatorLayout, child: View, event: MotionEvent) {
             when (event.actionMasked) {
@@ -311,7 +400,7 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
         init {
             behavior.setStartAlphaSwipeDistance(0.1f)
             behavior.setEndAlphaSwipeDistance(0.6f)
-            behavior.setSwipeDirection(SwipeDismissBehavior.SWIPE_DIRECTION_START_TO_END)
+            behavior.setSwipeDirection(SwipeDismissBehavior.SWIPE_DIRECTION_ANY)
         }
     }
 

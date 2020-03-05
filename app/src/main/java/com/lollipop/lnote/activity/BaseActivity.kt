@@ -185,7 +185,7 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
         }
         contentGroup.setPadding(left, 0, right, 0)
         floatingGroup.setPadding(left, top, right, bottom)
-        notificationHelper.onInsetChange(left, top, right, bottom)
+        notificationHelper.onInsetChange(left, top, right)
     }
 
     protected fun startLoading() {
