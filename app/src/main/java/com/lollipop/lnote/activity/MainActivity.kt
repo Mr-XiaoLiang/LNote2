@@ -46,7 +46,9 @@ class MainActivity : BaseActivity(),
         var isAlert = false
         addNoteBtn.setOnClickListener {
             if (isAlert) {
-                alert("测试测试测试")
+                alert("测试测试测试", R.drawable.ic_add_black_24dp, "Undo", {
+                    Toast.makeText(this, "Haha", Toast.LENGTH_SHORT).show()
+                })
             } else {
                 notify("测试内容")
             }

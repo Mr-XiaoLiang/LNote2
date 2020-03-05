@@ -299,6 +299,9 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
 
     private fun onDismiss(dismissType: DismissType) {
         isShown = false
+        if (dismissType == DismissType.Action) {
+            onClickListener?.invoke()
+        }
         onClickListener = null
         onDismissListener?.invoke(dismissType)
         onDismissListener = null
