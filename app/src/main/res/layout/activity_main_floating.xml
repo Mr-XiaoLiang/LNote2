@@ -14,6 +14,7 @@
         app:iconTint="@color/iconColor"
         android:textColor="@color/btnTextColor"
         android:text="@string/add_note"
+        android:id="@+id/addNoteBtn"
         app:backgroundTint="@color/colorPrimary"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

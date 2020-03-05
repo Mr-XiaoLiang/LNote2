@@ -46,6 +46,11 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
     protected abstract val contentViewId: Int
 
     /**
+     * 顶层的覆盖整个屏幕的View
+     */
+    protected abstract val fullScreenViewId: Int
+
+    /**
      * 内容框架的View的ID
      */
     private val layoutId = R.layout.activity_base
@@ -61,6 +66,13 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
 
     protected var isLoading = false
         private set
+
+    /**
+     * 消息展示的辅助器
+     */
+    private val notificationHelper: NotificationHelper by lazy {
+        NotificationHelper(rootGroup)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,6 +103,9 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
         if (floatingViewId != 0) {
             layoutInflater.inflate(floatingViewId, floatingGroup, true)
         }
+        if (fullScreenViewId != 0) {
+            layoutInflater.inflate(fullScreenViewId, fullScreenGroup, true)
+        }
         setSupportActionBar(toolbar)
         initInsetCallback(rootGroup)
         bindHeadImages()
@@ -100,7 +115,6 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
         loadHeadWallpaper()
         contentLoading.putColorForRes(R.color.colorPrimary,
             R.color.colorAccent, R.color.toolbarIcon)
-//        NotificationHelper(fullScreenGroup)
     }
 
     private fun loadHeadWallpaper() {
@@ -171,6 +185,7 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
         }
         contentGroup.setPadding(left, 0, right, 0)
         floatingGroup.setPadding(left, top, right, bottom)
+        notificationHelper.onInsetChange(left, top, right, bottom)
     }
 
     protected fun startLoading() {
@@ -185,6 +200,18 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
 
     override fun onSkinUpdate(info: NoteSkin) {
         contentLoading.putColorForRes(R.color.colorPrimary, R.color.colorAccent)
+    }
+
+    protected fun notify(value: CharSequence, icon: Int = 0, action: CharSequence = "",
+               onClick: (() -> Unit)? = null,
+               onDismiss: ((NotificationHelper.DismissType) -> Unit)? = null) {
+        notificationHelper.notify(value, icon, action, onClick, onDismiss)
+    }
+
+    protected fun alert(value: CharSequence, icon: Int = 0, action: CharSequence = "",
+              onClick: (() -> Unit)? = null,
+              onDismiss: ((NotificationHelper.DismissType) -> Unit)? = null) {
+        notificationHelper.alert(value, icon, action, onClick, onDismiss)
     }
 
 }

@@ -25,11 +25,9 @@ class NoteDetailActivity : BaseActivity() {
         }
     }
 
-    override val floatingViewId: Int
-        get() = R.layout.activity_note_detail_floating
-
-    override val contentViewId: Int
-        get() = R.layout.activity_note_detail
+    override val floatingViewId = R.layout.activity_note_detail_floating
+    override val contentViewId = R.layout.activity_note_detail
+    override val fullScreenViewId = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

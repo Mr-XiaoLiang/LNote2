@@ -11,6 +11,7 @@ import com.lollipop.lnote.R
 import com.lollipop.lnote.info.NoteOverviewInfo
 import com.lollipop.lnote.list.NoteOverviewAdapter
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main_floating.*
 import org.json.JSONObject
 import java.util.*
 import kotlin.collections.ArrayList
@@ -23,6 +24,7 @@ class MainActivity : BaseActivity(),
     SwipeRefreshLayout.OnRefreshListener{
     override val floatingViewId = R.layout.activity_main_floating
     override val contentViewId = R.layout.activity_main
+    override val fullScreenViewId = 0
 
     private var pageIndex = 0
 
@@ -40,6 +42,9 @@ class MainActivity : BaseActivity(),
         refreshLayout.setOnRefreshListener(this)
         bindFloatingDate()
         onRefresh()
+        addNoteBtn.setOnClickListener {
+            notify("测试内容")
+        }
     }
 
     private fun bindFloatingDate() {

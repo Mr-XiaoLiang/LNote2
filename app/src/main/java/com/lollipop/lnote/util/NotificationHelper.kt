@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.Guideline
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.behavior.SwipeDismissBehavior
 import com.google.android.material.button.MaterialButton
@@ -20,10 +22,6 @@ import com.lollipop.lnote.R
  * 消息的辅助类
  */
 class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachStateChangeListener {
-
-    companion object {
-        private const val WHAT_TIMEOUT = 233
-    }
 
     private val context = group.context
     private val panelView: View
@@ -38,6 +36,8 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
     private val messageHandler: Handler by lazy {
         Handler()
     }
+    private var pendingInfo: Info? = null
+    private var isShown = false
 
     private val notificationIconTint: ColorStateList by lazy {
         ColorStateList.valueOf(context.compatColor(R.color.topNotificationIcon))
@@ -59,8 +59,43 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
         }
     }
 
+    private val showTask = Runnable {
+        panelView.translationY = panelView.height * -1F
+        val animator = panelView.animate()
+        animator.cancel()
+        animator.translationY(0F)
+        animator.lifecycleBinding {
+            onStart {
+                if (panelView.visibility != View.VISIBLE) {
+                    panelView.visibility = View.VISIBLE
+                }
+                removeThis(it)
+            }
+        }
+        animator.start()
+    }
+
+    private val hideTask = Runnable {
+        val animator = panelView.animate()
+        animator.cancel()
+        animator.translationY(panelView.height * -1F)
+        animator.lifecycleBinding {
+            onEnd {
+                if (pendingInfo == null) {
+                    panelView.visibility = View.INVISIBLE
+                }
+                removeThis(it)
+            }
+        }
+        animator.start()
+    }
+
+    private val timeoutTask = Runnable {
+        doDismiss(DismissType.TimeOut)
+    }
+
     private fun initView() {
-        panelView.visibility = View.INVISIBLE
+//        panelView.visibility = View.INVISIBLE
         actionBtn.setOnClickListener(this)
         panelView.addOnAttachStateChangeListener(this)
     }
@@ -98,29 +133,47 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
     }
 
     fun onInsetChange(left: Int, top: Int, right: Int, bottom: Int) {
-        panelView.setPadding(left, top, right, 0)
+        panelView.findViewById<Guideline>(R.id.leftGuideline).setGuidelineBegin(left)
+        panelView.findViewById<Guideline>(R.id.rightGuideline).setGuidelineBegin(right)
+        panelView.findViewById<Guideline>(R.id.topGuideline).setGuidelineBegin(top)
     }
 
     fun notify(value: CharSequence, icon: Int = 0, action: CharSequence = "",
                onClick: (() -> Unit)? = null,
                onDismiss: ((DismissType) -> Unit)? = null) {
-        updateByNotification()
-        updateValue(value, icon, action, onClick, onDismiss)
+        showWith(false, value, icon, action, onClick, onDismiss)
     }
 
     fun alert(value: CharSequence, icon: Int = 0, action: CharSequence = "",
               onClick: (() -> Unit)? = null,
               onDismiss: ((DismissType) -> Unit)? = null) {
-        updateByAlert()
+        showWith(true, value, icon, action, onClick, onDismiss)
+    }
+
+    private fun showWith(isAlert: Boolean,
+                         value: CharSequence, icon: Int, action: CharSequence,
+                         onClick: (() -> Unit)?,
+                         onDismiss: ((DismissType) -> Unit)?) {
+        if (isShown) {
+            pendingInfo = Info(value, icon, action, onClick, onDismiss, isAlert)
+            doDismiss(DismissType.Replace)
+            return
+        }
+        if (isAlert) {
+            updateByAlert()
+        } else {
+            updateByNotification()
+        }
         updateValue(value, icon, action, onClick, onDismiss)
+        doShow()
     }
 
     private fun pauseTimeout() {
-        messageHandler.removeMessages(WHAT_TIMEOUT)
+        messageHandler.removeCallbacks(timeoutTask)
     }
 
     private fun restoreTimeout() {
-        messageHandler.sendEmptyMessageDelayed(WHAT_TIMEOUT, timeOut)
+        messageHandler.postDelayed(timeoutTask, timeOut)
     }
 
     private fun updateValue(value: CharSequence, icon: Int = 0, action: CharSequence = "",
@@ -158,6 +211,7 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
     }
 
     private fun onDismiss(dismissType: DismissType) {
+        isShown = false
         onClickListener = null
         onDismissListener?.invoke(dismissType)
         onDismissListener = null
@@ -166,12 +220,25 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
     private fun doDismiss(dismissType: DismissType) {
         pauseTimeout()
         onDismiss(dismissType)
+        panelView.removeCallbacks(hideTask)
+        panelView.removeCallbacks(showTask)
+        if (dismissType == DismissType.Remove) {
+            panelView.visibility = View.INVISIBLE
+            return
+        }
+        if (dismissType == DismissType.Detached) {
+            return
+        }
+        panelView.post(hideTask)
     }
 
-    private fun onShow() {
+    private fun doShow() {
         doDismiss(DismissType.Replace)
         restoreTimeout()
-        // TODO
+        isShown = true
+        panelView.removeCallbacks(hideTask)
+        panelView.removeCallbacks(showTask)
+        panelView.post(showTask)
     }
 
     override fun onViewDetachedFromWindow(v: View?) {
@@ -207,6 +274,9 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
         Replace
     }
 
+    private data class Info(val value: CharSequence, val icon: Int, val action: CharSequence,
+        val onClick: (() -> Unit)?, val onDismiss: ((DismissType) -> Unit)?, val isAlert: Boolean)
+
     private class Behavior(callback: (isDrag: Boolean) -> Unit) : SwipeDismissBehavior<View>() {
         private val delegate = BehaviorDelegate(this, callback)
 
@@ -227,8 +297,6 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
         fun onInterceptTouchEvent(parent: CoordinatorLayout, child: View, event: MotionEvent) {
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN ->
-                    // We want to make sure that we disable any Snackbar timeouts if the user is
-                    // currently touching the Snackbar. We restore the timeout when complete
                     if (parent.isPointInChildBounds(child, event.x.toInt(), event.y.toInt())) {
                         managerCallback.invoke(true)
                     }
