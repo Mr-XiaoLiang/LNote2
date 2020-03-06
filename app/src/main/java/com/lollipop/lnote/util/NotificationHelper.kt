@@ -279,6 +279,7 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
             onClickListener = onClick
         } else {
             actionBtn.visibility = View.GONE
+            onClickListener = null
         }
         onDismissListener = onDismiss
     }
@@ -325,7 +326,9 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
     }
 
     private fun doShow() {
-        doDismiss(DismissType.Replace)
+        if (isShown) {
+            doDismiss(DismissType.Replace)
+        }
         restoreTimeout()
         isShown = true
         panelView.removeCallbacks(hideTask)
