@@ -25,12 +25,12 @@ object BlurUtil {
         val allOut = Allocation.createFromBitmap(rs, out)
         // 设置blurScript对象的输入内存
         blurScript.setRadius(radius.range(1F, 25F))
-        //Perform the Renderscript
+        // 将数据流写入，并且读出处理好的数据流
         blurScript.setInput(allIn)
         blurScript.forEach(allOut)
-        //Copy the final bitmap created by the out Allocation to the outBitmap
+        // 拷贝到输出位置
         allOut.copyTo(out)
-        //After finishing everything, we destroy the Renderscript.
+        // 最后，销毁它
         rs.destroy()
     }
 

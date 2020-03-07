@@ -42,4 +42,6 @@
     <color name="editPanelText">#333333</color>
     <color name="editPaneHint">#DD333333</color>
     <color name="editPanelBtn">@color/colorPrimary</color>
+
+    <color name="paragraphEditBackground">#ECECEC</color>
 </resources>

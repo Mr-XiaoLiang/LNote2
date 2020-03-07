@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.google.android.material.snackbar.Snackbar
 import com.lollipop.lnote.R
 import com.lollipop.lnote.info.NoteOverviewInfo
 import com.lollipop.lnote.list.NoteOverviewAdapter
