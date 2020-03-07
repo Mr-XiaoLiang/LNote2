@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -37,6 +38,12 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
     private var pendingInfo: Info? = null
     private var isShown = false
 
+    private val duration = 150L
+
+    private val interpolator: AccelerateInterpolator by lazy {
+        AccelerateInterpolator(0.8F)
+    }
+
     private val notificationIconTint: ColorStateList by lazy {
         ColorStateList.valueOf(context.compatColor(R.color.topNotificationIcon))
     }
@@ -59,6 +66,8 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
         panelView.translationY = panelView.height * -1F
         val animator = panelView.animate()
         animator.cancel()
+        animator.duration = duration
+        animator.interpolator = interpolator
         animator.translationY(0F)
         animator.lifecycleBinding {
             onStart {
@@ -74,6 +83,8 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
     private val hideTask = Runnable {
         val animator = panelView.animate()
         animator.cancel()
+        animator.duration = duration
+        animator.interpolator = interpolator
         animator.translationY(panelView.height * -1F)
         animator.lifecycleBinding {
             onEnd {
