@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
@@ -12,10 +13,12 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.lollipop.lnote.R
+import com.lollipop.lnote.dialog.AdaptiveInset
 import com.lollipop.lnote.skin.NoteSkin
 import com.lollipop.lnote.util.BingWallpaper
 import com.lollipop.lnote.util.GlideBlurTransformation
-import com.lollipop.lnote.util.NotificationHelper
+import com.lollipop.lnote.dialog.NotificationHelper
+import com.lollipop.lnote.dialog.TopPanelDialog
 import com.lollipop.lnote.util.PreferenceHelper.save
 import com.lollipop.lnote.util.PreferenceHelper.take
 import com.lollipop.lnote.util.range
@@ -68,11 +71,39 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
         private set
 
     /**
+     * 自适应缩进的对象集合
+     */
+    private val adaptiveInsetWidgets = ArrayList<AdaptiveInset>()
+
+    /**
      * 消息展示的辅助器
      */
     private val notificationHelper: NotificationHelper by lazy {
-        NotificationHelper(rootGroup)
+        val helper = NotificationHelper(rootGroup)
+        registerInset(helper)
+        helper
     }
+
+    private val selfRegisterProvider: TopPanelDialog.SelfRegistration by lazy {
+        object: TopPanelDialog.SelfRegistration {
+            override fun register(inset: AdaptiveInset) {
+                registerInset(inset)
+            }
+            override fun unregister(inset: AdaptiveInset) {
+                unregisterInset(inset)
+            }
+        }
+    }
+
+    protected val registerProvider: TopPanelDialog.SelfRegistration
+        get() {
+            return selfRegisterProvider
+        }
+
+    protected val dialogGroup: ViewGroup
+        get() {
+            return rootGroup
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -185,7 +216,9 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
         }
         contentGroup.setPadding(left, 0, right, 0)
         floatingGroup.setPadding(left, top, right, bottom)
-        notificationHelper.onInsetChange(left, top, right)
+        adaptiveInsetWidgets.forEach {
+            it.onInsetChange(left, top, right, bottom)
+        }
     }
 
     protected fun startLoading() {
@@ -212,6 +245,15 @@ abstract class BaseActivity: AppCompatActivity(), SkinProvider<NoteSkin> {
               onClick: (() -> Unit)? = null,
               onDismiss: ((NotificationHelper.DismissType) -> Unit)? = null) {
         notificationHelper.alert(value, icon, action, onClick, onDismiss)
+    }
+
+    protected fun registerInset(inset: AdaptiveInset) {
+        inset.onInsetChange(windowInset.left, windowInset.top, windowInset.right, windowInset.bottom)
+        adaptiveInsetWidgets.add(inset)
+    }
+
+    protected fun unregisterInset(inset: AdaptiveInset) {
+        adaptiveInsetWidgets.remove(inset)
     }
 
 }

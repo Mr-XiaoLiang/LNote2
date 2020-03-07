@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/editPanelBackground"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:elevation="16dp">
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/inputText"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        app:layout_constraintDimensionRatio="16:9"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/completeBtn"
+        android:background="@android:color/transparent"
+        android:textColor="@color/editPanelText"
+        android:textColorHint="@color/editPaneHint"
+        android:textSize="16sp"
+        android:padding="16dp"
+        android:gravity="start|top"
+        android:hint="@string/app_name"
+        android:scrollbars="vertical"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/revokeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/completeBtn"
+        android:layout_marginEnd="16dp"
+        app:iconTint="@color/editPanelBtn"
+        android:textColor="@color/editPanelBtn"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:text="@string/revoke"
+        app:icon="@drawable/ic_close_black_24dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/completeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginEnd="16dp"
+        app:iconTint="@color/editPanelBtn"
+        android:textColor="@color/editPanelBtn"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:text="@string/complete"
+        app:icon="@drawable/ic_done_black_24dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

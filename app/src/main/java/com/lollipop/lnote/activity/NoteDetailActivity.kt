@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Menu
 import androidx.core.content.ContextCompat
 import com.lollipop.lnote.R
+import com.lollipop.lnote.dialog.LongEditDialog
 import com.lollipop.lnote.info.NoteOverviewInfo
 import com.lollipop.lnote.skin.NoteSkin
 import com.lollipop.lnote.util.compatColor
@@ -29,8 +30,17 @@ class NoteDetailActivity : BaseActivity() {
     override val contentViewId = R.layout.activity_note_detail
     override val fullScreenViewId = 0
 
+    private val longEditDialog: LongEditDialog by lazy {
+        LongEditDialog(registerProvider, dialogGroup, false)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        toolboxFab.setOnClickListener {
+            longEditDialog.show("") {
+                notify(it)
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

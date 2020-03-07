@@ -1,4 +1,4 @@
-package com.lollipop.lnote.util
+package com.lollipop.lnote.dialog
 
 import android.content.res.ColorStateList
 import android.os.Handler
@@ -14,13 +14,20 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.behavior.SwipeDismissBehavior
 import com.google.android.material.button.MaterialButton
 import com.lollipop.lnote.R
+import com.lollipop.lnote.util.compatColor
+import com.lollipop.lnote.util.lifecycleBinding
+import com.lollipop.lnote.util.onEnd
+import com.lollipop.lnote.util.onStart
 
 /**
  * @author lollipop
  * @date 2020/3/4 01:00
  * 消息的辅助类
  */
-class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachStateChangeListener {
+class NotificationHelper(group: ViewGroup):
+    View.OnClickListener,
+    View.OnAttachStateChangeListener,
+    AdaptiveInset{
 
     private val context = group.context
     private val panelView: View
@@ -117,13 +124,14 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
         if (layoutParams !is CoordinatorLayout.LayoutParams) {
             return
         }
-        val behavior = Behavior { isDrag ->
-            if (isDrag) {
-                pauseTimeout()
-            } else {
-                restoreTimeout()
+        val behavior =
+            Behavior { isDrag ->
+                if (isDrag) {
+                    pauseTimeout()
+                } else {
+                    restoreTimeout()
+                }
             }
-        }
 
         behavior.listener = object : SwipeDismissBehavior.OnDismissListener {
             override fun onDismiss(view: View) {
@@ -148,7 +156,7 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
         layoutParams.behavior = behavior
     }
 
-    fun onInsetChange(left: Int, top: Int, right: Int) {
+    override fun onInsetChange(left: Int, top: Int, right: Int, bottom: Int) {
         panelView.setPadding(left, top, right, 0)
     }
 
@@ -169,7 +177,14 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
                          onClick: (() -> Unit)?,
                          onDismiss: ((DismissType) -> Unit)?) {
         if (isShown) {
-            pendingInfo = Info(value, icon, action, onClick, onDismiss, isAlert)
+            pendingInfo = Info(
+                value,
+                icon,
+                action,
+                onClick,
+                onDismiss,
+                isAlert
+            )
             doDismiss(DismissType.Replace)
             return
         }
@@ -305,10 +320,14 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
     }
 
     private data class Info(val value: CharSequence, val icon: Int, val action: CharSequence,
-        val onClick: (() -> Unit)?, val onDismiss: ((DismissType) -> Unit)?, val isAlert: Boolean)
+                            val onClick: (() -> Unit)?, val onDismiss: ((DismissType) -> Unit)?, val isAlert: Boolean)
 
     private class Behavior(callback: (isDrag: Boolean) -> Unit) : SwipeDismissBehavior<View>() {
-        private val delegate = BehaviorDelegate(this, callback)
+        private val delegate =
+            BehaviorDelegate(
+                this,
+                callback
+            )
 
         override fun canSwipeDismissView(child: View): Boolean {
             return true
@@ -344,5 +363,6 @@ class NotificationHelper(group: ViewGroup): View.OnClickListener, View.OnAttachS
             behavior.setSwipeDirection(SwipeDismissBehavior.SWIPE_DIRECTION_ANY)
         }
     }
+
 
 }

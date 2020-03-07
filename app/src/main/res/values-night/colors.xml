@@ -36,4 +36,9 @@
     <color name="topAlertContent">#DDFFFFFF</color>
     <color name="topAlertAction">@color/toolbarIcon</color>
     <color name="topAlertIcon">@color/toolbarIcon</color>
+
+    <color name="editPanelBackground">#323232</color>
+    <color name="editPanelText">#CCFFFFFF</color>
+    <color name="editPaneHint">#66FFFFFF</color>
+    <color name="editPanelBtn">#008577</color>
 </resources>
