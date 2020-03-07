@@ -1,12 +1,13 @@
 package com.lollipop.lnote.list.paragraph
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.lnote.R
 import com.lollipop.lnote.info.paragraph.ParagraphInfo
-import java.lang.RuntimeException
+import com.lollipop.lnote.util.compatColor
 
 /**
  * @author lollipop
@@ -37,10 +38,39 @@ abstract class ParagraphHolder<T: ParagraphInfo>(group: ViewGroup):
     }
 
     fun bind(info: ParagraphInfo, inEdit: Boolean) {
-        val paragraphInfo = (info.javaClass as? T)?: throw RuntimeException("$info is not the required type")
-        onBind(paragraphInfo, inEdit)
+        updateGroup(inEdit)
+        val paragraphInfo = info.javaClass as? T
+        if (paragraphInfo != null) {
+            onBind(paragraphInfo, inEdit)
+        }
+    }
+
+    private fun updateGroup(inEdit: Boolean) {
+        itemView.setBackgroundColor(if (inEdit) {
+            itemView.compatColor(R.color.paragraphEditBackground)
+        } else {
+            Color.TRANSPARENT
+        })
+        itemView.layoutParams.let {
+            if (it is ViewGroup.MarginLayoutParams) {
+                if (inEdit) {
+                    it.setMargins(
+                        0,
+                        itemView.resources.getDimension(R.dimen.paragraphEditTop).toInt(),
+                        0,
+                        0)
+                } else {
+                    it.setMargins(0, 0, 0, 0)
+                }
+            }
+        }
+        itemView.translationZ = if (inEdit) {
+            itemView.resources.getDimension(R.dimen.paragraphEditZ)
+        } else { 0F }
     }
 
     abstract fun onBind(info: T, inEdit: Boolean)
+
+    abstract fun openStylePanel()
 
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.View
 import androidx.core.content.ContextCompat
 import java.io.ByteArrayOutputStream
 import java.io.PrintWriter
@@ -117,4 +118,8 @@ fun String.numberFormat(length: Int = 2): String {
 
 fun Context.compatColor(id: Int): Int {
     return ContextCompat.getColor(this, id)
+}
+
+fun View.compatColor(id: Int): Int {
+    return context.compatColor(id)
 }
