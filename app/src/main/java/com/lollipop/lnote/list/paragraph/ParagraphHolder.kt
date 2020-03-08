@@ -15,7 +15,7 @@ import com.lollipop.lnote.util.compatColor
  * 段落的Info
  */
 abstract class ParagraphHolder<T: ParagraphInfo>(group: ViewGroup):
-    RecyclerView.ViewHolder(createBaseView(group)) {
+    RecyclerView.ViewHolder(createBaseView(group)), View.OnClickListener {
 
     companion object {
         private fun createBaseView(group: ViewGroup): View {
@@ -28,6 +28,19 @@ abstract class ParagraphHolder<T: ParagraphInfo>(group: ViewGroup):
 
     init {
         initContent()
+    }
+
+    private val dragView: View by lazy {
+        val view = itemView.findViewById<View>(R.id.dragView)
+        view
+    }
+
+    private val styleView: View by lazy {
+        val view = itemView.findViewById<View>(R.id.dragView)
+        view.setOnClickListener{
+            openStylePanel()
+        }
+        view
     }
 
     private fun initContent() {
