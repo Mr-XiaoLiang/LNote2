@@ -6,4 +6,5 @@
     <string name="done">完成</string>
     <string name="complete">完成</string>
     <string name="revoke">放弃</string>
+    <string name="please_enter">请输入...</string>
 </resources>
