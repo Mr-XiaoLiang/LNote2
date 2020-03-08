@@ -15,12 +15,19 @@ class PlatterLayout(context: Context, attrs: AttributeSet?, defStyleAttr: Int):
     constructor(context: Context, attrs: AttributeSet?): this(context, attrs, 0)
     constructor(context: Context): this(context, null)
 
+    var orientation = Orientation.HORIZONTAL
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         TODO("Not yet implemented")
+    }
+
+    enum class Orientation {
+        HORIZONTAL,
+        VERTICAL
     }
 
 }
