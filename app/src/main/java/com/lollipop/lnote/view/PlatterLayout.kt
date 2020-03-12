@@ -52,7 +52,7 @@ class PlatterLayout(context: Context, attrs: AttributeSet?, defStyleAttr: Int):
         if (index < 0) {
             return Rect()
         }
-        while (boundList.size < index) {
+        while (boundList.size <= index) {
             boundList.add(Rect())
         }
         return boundList[index]
@@ -312,7 +312,7 @@ class PlatterLayout(context: Context, attrs: AttributeSet?, defStyleAttr: Int):
                 }
             }
         }
-        child.measure(-1, -1)
+        child.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED)
         return Size(child.measuredWidth, child.measuredHeight)
     }
 

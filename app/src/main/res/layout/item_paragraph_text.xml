@@ -54,4 +54,22 @@
         android:paddingEnd="10dp"
         android:paddingStart="5dp"/>
 
+    <com.lollipop.lnote.view.PlatterLayout
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_delete_black_24dp"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_launcher_background"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_delete_black_24dp"/>
+    </com.lollipop.lnote.view.PlatterLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
