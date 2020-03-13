@@ -8,6 +8,7 @@ import android.util.Size
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import kotlin.math.min
 
 /**
  * @author lollipop
@@ -110,7 +111,8 @@ class PlatterLayout(context: Context, attrs: AttributeSet?, defStyleAttr: Int):
                 left += childWidth
             }
             // 完成测量, 提交数据时，带上前面减去的padding
-            setMeasuredDimension(widthSize + paddingLeft + paddingRight,
+            setMeasuredDimension(
+                min(widthSize, left - paddingLeft) + paddingLeft + paddingRight,
                 maxHeight + paddingTop + paddingBottom)
         } else {
             // 认为是固定高度不固定宽度的场景，此时直接按顺序排下去
@@ -192,7 +194,7 @@ class PlatterLayout(context: Context, attrs: AttributeSet?, defStyleAttr: Int):
             }
             // 完成测量, 提交数据时，带上前面减去的padding
             setMeasuredDimension(maxWidth + paddingLeft + paddingRight,
-                heightSize + paddingTop + paddingBottom)
+                min(top - paddingTop, heightSize) + paddingTop + paddingBottom)
         } else {
             // 认为是固定宽度不固定高度的场景，此时按照顺序直接排下去
             val widthSize = MeasureSpec.getSize(widthMeasureSpec) - paddingLeft - paddingRight
@@ -261,7 +263,7 @@ class PlatterLayout(context: Context, attrs: AttributeSet?, defStyleAttr: Int):
                     example = size.height
                     result[index] = 1F
                 } else {
-                    result[index] = size.height.toFloat() / example
+                    result[index] = example/ size.height.toFloat()
                 }
             } else {
                 result[index] = 0F
@@ -284,7 +286,7 @@ class PlatterLayout(context: Context, attrs: AttributeSet?, defStyleAttr: Int):
                     example = size.width
                     result[index] = 1F
                 } else {
-                    result[index] = size.width.toFloat() / example
+                    result[index] = example / size.width.toFloat()
                 }
             } else {
                 result[index] = 0F

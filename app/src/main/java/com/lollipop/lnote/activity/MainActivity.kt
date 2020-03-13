@@ -7,9 +7,11 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.bumptech.glide.Glide
 import com.lollipop.lnote.R
 import com.lollipop.lnote.info.NoteOverviewInfo
 import com.lollipop.lnote.list.NoteOverviewAdapter
+import com.lollipop.lnote.view.PlatterLayout
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_floating.*
 import org.json.JSONObject

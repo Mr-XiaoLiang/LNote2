@@ -1,15 +1,18 @@
 package com.lollipop.lnote.util
 
 import android.content.Context
+import android.graphics.PointF
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
 import java.io.ByteArrayOutputStream
 import java.io.PrintWriter
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import kotlin.math.abs
 import kotlin.math.min
 
 /**
@@ -122,4 +125,122 @@ fun Context.compatColor(id: Int): Int {
 
 fun View.compatColor(id: Int): Int {
     return context.compatColor(id)
+}
+
+class ClickHelper private constructor(private val view: View) {
+
+    // 连击次数
+    private var pointSize = 0
+    // 按下时间，以此来判断区分点击和长按
+    private var touchDownTime = 0L
+    // 最大波动范围（手指抖动范围，规避滑动行为）
+    var maxFluctuation = -1
+    // 按下位置
+    private val touchDownPoint = PointF()
+    // 是否激活本次点击
+    private var active = false
+    // 单次点击允许的最长手指按下时间
+    var maxKeepTime = 300L
+    // 连击允许的超时时间
+    var continuouslyKeepTime = 50L
+    // 点击事件任务
+    private val clickTask = Runnable {
+        callOnClick()
+    }
+
+    companion object {
+        fun create(view: View): ClickHelper {
+            return ClickHelper(view)
+        }
+    }
+
+    private val clickListenerList = ArrayList<ClickListener>()
+
+    fun onTouchEvent(event: MotionEvent) {
+        when(event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                // 按下，记录信息
+                touchDownTime = System.currentTimeMillis()
+                touchDownPoint.set(event.x, event.y)
+                active = true
+            }
+            MotionEvent.ACTION_MOVE -> {
+                if (!active) {
+                    return
+                }
+                // 发生移动，检查移动范围
+                val x = event.x
+                val y = event.y
+                if (maxFluctuation > 0 && (abs(x - touchDownPoint.x) > maxFluctuation ||
+                            abs(y - touchDownPoint.y) > maxFluctuation)) {
+                    reset()
+                    return
+                }
+                if (x < 0 || y < 9 || x > view.width || y > view.height) {
+                    reset()
+                    return
+                }
+                // 发生超时，提前清理任务
+                val now = System.currentTimeMillis()
+                if (now > maxKeepTime) {
+                    reset()
+                    return
+                }
+            }
+            MotionEvent.ACTION_UP -> {
+                if (!active) {
+                    return
+                }
+                val now = System.currentTimeMillis()
+                if (now > maxKeepTime) {
+                    reset()
+                    return
+                }
+                clickSuccessful()
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                // 触发取消时间，放弃本轮所有计数
+                reset()
+            }
+            MotionEvent.ACTION_POINTER_DOWN -> {
+                // 多个指头，放弃事件
+                reset()
+            }
+        }
+    }
+
+    private fun callOnClick() {
+        if (pointSize < 1) {
+            return
+        }
+        clickListenerList.forEach {
+            it.onClick(view, pointSize)
+        }
+        // 事件被消耗，清空
+        reset()
+    }
+
+    private fun clickSuccessful() {
+        active = false
+        pointSize++
+        view.removeCallbacks(clickTask)
+        view.postDelayed(clickTask, maxKeepTime + continuouslyKeepTime)
+    }
+
+    private fun reset() {
+        pointSize = 0
+        view.removeCallbacks(clickTask)
+        touchDownTime = 0L
+        touchDownPoint.set(0F, 0F)
+        active = false
+    }
+
+    fun addClickListener(listener: ClickListener) {
+        clickListenerList.add(listener)
+    }
+
+    interface ClickListener {
+        fun onClick(view: View, count: Int)
+    }
+
 }
